@@ -35,6 +35,9 @@ final class ImportCommand extends Command
 
     public function handle(): int
     {
+        // Artisan reuses the command object, e.g. when called from code.
+        $this->counts = ['created' => 0, 'updated' => 0, 'unchanged' => 0, 'skipped' => 0];
+
         $path = $this->argument('path');
         $root = is_string($path) ? rtrim($path, '/') : '';
 

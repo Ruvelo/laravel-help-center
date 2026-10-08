@@ -28,6 +28,9 @@ final class ExportCommand extends Command
 
     public function handle(): int
     {
+        // Artisan reuses the command object, e.g. when called from code.
+        $this->written = $this->kept = 0;
+
         $path = $this->argument('path');
         $root = is_string($path) ? rtrim($path, '/') : '';
 
