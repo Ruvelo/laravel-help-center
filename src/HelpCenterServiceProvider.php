@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Mcp\Server;
+use Laravel\Mcp\Server\Registrar;
 use Ruvelo\HelpCenter\Console\ExportCommand;
 use Ruvelo\HelpCenter\Console\ImportCommand;
 use Ruvelo\HelpCenter\Markdown\Renderer;
@@ -45,6 +47,10 @@ class HelpCenterServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         }
 
+        if (config('help-center.mcp.enabled', false) && class_exists(Registrar::class)) {
+            $this->registerMcp();
+        }
+
         if (config('help-center.run_migrations', true)) {
             $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         }
@@ -63,6 +69,21 @@ class HelpCenterServiceProvider extends ServiceProvider
             $this->publishesMigrations([
                 __DIR__.'/../database/migrations' => database_path('migrations'),
             ], 'help-center-migrations');
+        }
+    }
+
+    /**
+     * Serve the MCP server over HTTP and, if asked, over stdio. Only called
+     * when laravel/mcp is installed.
+     */
+    private function registerMcp(): void
+    {
+        $this->loadRoutesFrom(__DIR__.'/../routes/mcp.php');
+
+        $server = config('help-center.mcp.server');
+
+        if (config('help-center.mcp.local', false) && is_string($server) && is_subclass_of($server, Server::class)) {
+            $this->app->make(Registrar::class)->local('help-center', $server);
         }
     }
 }

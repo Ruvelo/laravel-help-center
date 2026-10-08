@@ -27,9 +27,13 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.13",
+        "laravel/mcp": "^1.0",
         "laravel/pint": "^1.32",
         "orchestra/testbench": "^10.0|^11.0",
         "phpunit/phpunit": "^11.5|^12.0"
+    },
+    "suggest": {
+        "laravel/mcp": "Serve the help center to AI agents and support chatbots over MCP (^1.0)."
     },
     "autoload": {
         "psr-4": {

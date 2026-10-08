@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
+use Laravel\Mcp\Server\McpServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Ruvelo\HelpCenter\HelpCenter;
 use Ruvelo\HelpCenter\HelpCenterServiceProvider;
@@ -21,7 +22,11 @@ abstract class TestCase extends Orchestra
 
     protected function getPackageProviders($app): array
     {
-        return [HelpCenterServiceProvider::class];
+        return [
+            // Optional: laravel/mcp is a dev dependency, not a requirement.
+            ...(class_exists(McpServiceProvider::class) ? [McpServiceProvider::class] : []),
+            HelpCenterServiceProvider::class,
+        ];
     }
 
     protected function defineEnvironment($app): void

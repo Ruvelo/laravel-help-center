@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Ruvelo\HelpCenter\Mcp\HelpCenterServer;
+
 return [
 
     /*
@@ -107,6 +109,34 @@ return [
         'prefix' => 'api/help',
         'middleware' => ['api'],
         'write_middleware' => ['auth:sanctum'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | MCP server
+    |--------------------------------------------------------------------------
+    |
+    | Lets AI agents and support chatbots search and read the help center over
+    | the Model Context Protocol. Needs `composer require laravel/mcp`; off by
+    | default. Tools: search_articles, read_article, list_categories, plus
+    | write_article for editors when `allow_writes` is on.
+    |
+    | `middleware` guards the endpoint. The default expects a Sanctum token.
+    | A public help center may drop the auth (e.g. ['api', 'throttle:60,1']):
+    | guests only ever see published articles. Drafts and write_article also
+    | need the `help-center-edit` gate. Set `path` to null to skip the HTTP
+    | endpoint, and `local` to true to serve over stdio instead:
+    | `php artisan mcp:start help-center`.
+    |
+    */
+
+    'mcp' => [
+        'enabled' => (bool) env('HELP_CENTER_MCP', false),
+        'path' => 'mcp/help',
+        'middleware' => ['api', 'auth:sanctum'],
+        'local' => false,
+        'allow_writes' => (bool) env('HELP_CENTER_MCP_WRITES', false),
+        'server' => HelpCenterServer::class,
     ],
 
     /*
