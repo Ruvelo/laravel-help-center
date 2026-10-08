@@ -7,7 +7,7 @@
     <section class="hc-hero">
         <h1>{{ config('help-center.headline', 'How can we help?') }}</h1>
         <p>Search the help center, or browse by topic below.</p>
-        @include('help::partials.search', ['id' => 'hc-hero-search', 'placeholder' => 'Search for answers, e.g. “download an invoice”', 'autofocus' => true])
+        @include('help::partials.search', ['id' => 'hc-hero-search', 'placeholder' => 'Search for answers…', 'autofocus' => true])
         @if ($popular->isNotEmpty())
             <p class="hc-hero-hint">Popular:
                 @foreach ($popular->take(3) as $article)

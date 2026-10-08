@@ -68,9 +68,9 @@
                     pending?.abort();
                     pending = new AbortController();
                     try {
-                        const data = demo
+                        const data = await (demo
                             ? demo.suggest(query)
-                            : await (await fetch(input.dataset.helpSuggest + '?q=' + encodeURIComponent(query), { signal: pending.signal, headers: { Accept: 'application/json' } })).json();
+                            : fetch(input.dataset.helpSuggest + '?q=' + encodeURIComponent(query), { signal: pending.signal, headers: { Accept: 'application/json' } }).then((response) => response.json()));
                         if (input.value.trim() === query) show(data);
                     } catch (error) {
                         if (error.name !== 'AbortError') close();

@@ -2,7 +2,7 @@
 @once
     <style>
         .hcw { --hcw-bg: #ffffff; --hcw-line: #e4e4ef; --hcw-ink: #16162a; --hcw-text-2: #4b4b63; --hcw-text-3: #74748b; --hcw-accent: #3d4eff; --hcw-accent-ink: #2b38d6; --hcw-accent-soft: #eef0ff;
-            font: 15px/1.5 "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--hcw-ink); background: var(--hcw-bg); border: 1px solid var(--hcw-line); border-radius: 14px; padding: 1rem 1.1rem .6rem; box-sizing: border-box; }
+            font: 15px/1.5 "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"; color: var(--hcw-ink); background: var(--hcw-bg); border: 1px solid var(--hcw-line); border-radius: 14px; padding: 1rem 1.1rem .6rem; box-sizing: border-box; }
         @media (prefers-color-scheme: dark) {
             .hcw { --hcw-bg: #171725; --hcw-line: #2a2a3f; --hcw-ink: #f1f1f8; --hcw-text-2: #b6b6cc; --hcw-text-3: #8787a3; --hcw-accent: #8f9bff; --hcw-accent-ink: #b3bbff; --hcw-accent-soft: #1e2150; }
         }

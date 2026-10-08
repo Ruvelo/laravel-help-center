@@ -22,7 +22,7 @@
         --help-warning-soft: #fff4e0;
         --help-radius: 8px;
         --help-radius-lg: 14px;
-        --help-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --help-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
         --help-mono: "Geist Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
         background: var(--help-bg); color: var(--help-ink); font: 15px/1.6 var(--help-sans); -webkit-font-smoothing: antialiased;
         color-scheme: light;
@@ -72,8 +72,9 @@
     /* Search box and suggestions */
     .hc-search { position: relative; }
     .hc-search::before { content: ""; position: absolute; left: .8rem; top: 50%; width: .85rem; height: .85rem; translate: 0 -50%; background: var(--help-text-3); pointer-events: none; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7 1.5a5.5 5.5 0 0 1 4.38 8.83l3.15 3.14-1.06 1.06-3.14-3.15A5.5 5.5 0 1 1 7 1.5Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7 1.5a5.5 5.5 0 0 1 4.38 8.83l3.15 3.14-1.06 1.06-3.14-3.15A5.5 5.5 0 1 1 7 1.5Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z'/%3E%3C/svg%3E") center / contain no-repeat; }
-    .hc-search input[type=search] { padding-left: 2.2rem; background: var(--help-muted); border-color: transparent; }
-    .hc-search input[type=search]:focus { background: var(--help-bg); }
+    .hc .hc-search input[type=search] { padding-left: 2.2rem; background: var(--help-muted); border-color: transparent; }
+    .hc .hc-search input[type=search]:focus { background: var(--help-bg); border-color: var(--help-accent); }
+    .hc .hc-search input[type=search]::-webkit-search-cancel-button { display: none; }
     .hc-suggest { position: absolute; z-index: 30; left: 0; right: 0; top: calc(100% + .4rem); background: var(--help-bg); border: 1px solid var(--help-line); border-radius: var(--help-radius-lg); padding: .35rem; text-align: left; box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--help-accent) 60%, transparent); }
     .hc .hc-suggest a { display: block; padding: .55rem .75rem; border-radius: var(--help-radius); color: var(--help-ink); }
     .hc .hc-suggest a:hover, .hc .hc-suggest a.is-active { background: var(--help-accent-soft); text-decoration: none; }
@@ -81,7 +82,7 @@
     .hc-suggest-meta { display: block; color: var(--help-text-3); font-size: .8rem; margin-top: .1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .hc .hc-suggest a.hc-suggest-all { color: var(--help-accent); font-size: .85rem; font-weight: 500; border-top: 1px solid var(--help-line); border-radius: 0 0 var(--help-radius) var(--help-radius); margin-top: .25rem; }
     .hc-suggest-empty { padding: .6rem .75rem; color: var(--help-text-3); font-size: .875rem; margin: 0; }
-    .hc mark { background: var(--help-accent-soft); color: inherit; border-radius: 3px; padding: 0 .1em; }
+    .hc mark { background: var(--help-accent-soft); color: inherit; border-radius: 3px; padding: 0; box-shadow: 0 0 0 .1em var(--help-accent-soft); }
 
     /* Hero */
     .hc-hero { position: relative; text-align: center; padding: 4.5rem 16px 3.75rem; background: radial-gradient(60rem 22rem at 50% -6rem, color-mix(in srgb, var(--help-accent-2) 22%, transparent), transparent 70%), linear-gradient(var(--help-accent-soft), var(--help-bg)); border-bottom: 1px solid var(--help-line); }
@@ -89,8 +90,8 @@
     .hc-hero p { color: var(--help-text-2); font-size: 1.05rem; margin: 0 auto 2rem; max-width: 34rem; }
     .hc-hero .hc-search { max-width: 40rem; margin: 0 auto; }
     .hc-hero .hc-search::before { left: 1.15rem; width: 1.1rem; height: 1.1rem; }
-    .hc-hero .hc-search input[type=search] { font-size: 1.05rem; padding: 1rem 1.1rem 1rem 3rem; border-radius: var(--help-radius-lg); background: var(--help-bg); border: 1px solid var(--help-line); box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--help-accent) 60%, transparent); }
-    .hc-hero .hc-search input[type=search]:focus { border-color: var(--help-accent); box-shadow: 0 0 0 4px var(--help-accent-soft), 0 24px 60px -32px color-mix(in srgb, var(--help-accent) 60%, transparent); }
+    .hc .hc-hero .hc-search input[type=search] { font-size: 1.05rem; padding: 1rem 1.1rem 1rem 3rem; border-radius: var(--help-radius-lg); background: var(--help-bg); border: 1px solid var(--help-line); box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--help-accent) 60%, transparent); }
+    .hc .hc-hero .hc-search input[type=search]:focus { border-color: var(--help-accent); box-shadow: 0 0 0 4px var(--help-accent-soft), 0 24px 60px -32px color-mix(in srgb, var(--help-accent) 60%, transparent); }
     .hc-hero-hint { margin-top: 1rem !important; margin-bottom: 0 !important; font-size: .875rem !important; color: var(--help-text-3) !important; }
     .hc-hero-hint a { color: var(--help-text-2) !important; border-bottom: 1px dashed var(--help-line); }
     .hc-hero-hint a:hover { color: var(--help-accent) !important; text-decoration: none !important; }
@@ -115,7 +116,8 @@
     /* Three columns, like the Laravel docs: menu, article, outline. */
     .hc-shell { max-width: 90rem; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 16rem minmax(0, 1fr) 13rem; gap: 3.5rem; }
     .hc-shell:not(:has(.hc-outline)) { grid-template-columns: 16rem minmax(0, 1fr); }
-    .hc-shell--wide, .hc-shell--wide:not(:has(.hc-outline)) { grid-template-columns: minmax(0, 1fr); max-width: 80rem; }
+    /* Higher specificity than the breakpoints below: editor pages stay one column. */
+    .hc-shell.hc-shell--wide, .hc-shell.hc-shell--wide:not(:has(.hc-outline)) { grid-template-columns: minmax(0, 1fr); max-width: 80rem; }
     .hc-main { min-width: 0; max-width: 48rem; padding: 2.25rem 0 3rem; }
     .hc-shell--wide .hc-main { max-width: none; }
     .hc-foot { max-width: 90rem; margin: 0 auto; padding: 1.25rem 24px 2rem; color: var(--help-text-3); font-size: .8rem; }

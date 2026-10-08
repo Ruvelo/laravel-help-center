@@ -16,7 +16,7 @@
             @include('help::manage.tabs')
 
             @if ($leastHelpful->isNotEmpty() && ! $article)
-                <h2 style="font-size: 1.1rem; margin: 0 0 .75rem">Articles readers found least helpful</h2>
+                <h2 style="font-size: 1.1rem; margin: 0 0 .75rem">Articles with the most “No” votes</h2>
                 <div class="hc-table-wrap" style="margin-bottom: 2.5rem">
                     <table class="hc-table">
                         <thead>

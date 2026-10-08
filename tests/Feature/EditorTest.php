@@ -287,7 +287,7 @@ class EditorTest extends TestCase
         $this->actingAs($this->editor());
 
         $this->get('/help/manage/feedback')->assertOk()
-            ->assertSee('Articles readers found least helpful')
+            ->assertSee('Articles with the most “No” votes')
             ->assertSeeInOrder(['Refunds', 'Plans'])
             ->assertSee('How long does it take?')
             ->assertSee('Missing the enterprise plan.');

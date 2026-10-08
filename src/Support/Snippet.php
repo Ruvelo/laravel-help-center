@@ -16,9 +16,10 @@ final class Snippet
     public static function around(string $text, string $query, int $radius = 90): string
     {
         foreach (Article::words($query) as $word) {
-            $excerpt = Str::excerpt($text, $word, ['radius' => $radius]);
+            $excerpt = Str::excerpt($text, $word, ['radius' => $radius, 'omission' => '…']);
             if (is_string($excerpt) && $excerpt !== '') {
-                return $excerpt;
+                // Start and end on whole words.
+                return preg_replace(['/^…\S*\s+/u', '/\s+\S*…$/u'], ['…', '…'], $excerpt) ?? $excerpt;
             }
         }
 
