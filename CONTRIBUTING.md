@@ -31,8 +31,8 @@ composer check
 ## Making a change
 
 1. Branch from `main`.
-2. Write a test that fails without your change. Feature tests live in `tests/Feature`, unit tests in `tests/Unit`.
-3. Keep the public API stable: `Ruvelo\HelpCenter\HelpCenter`, the models, events, exceptions, config keys, routes, the Blade component and the JSON shapes. If you must change one, say so in the PR.
+2. Write a test that fails without your change. Feature tests live in `tests/Feature` (MCP ones in `tests/Feature/Mcp`), unit tests in `tests/Unit`. Code under `src/Mcp` must only load when `laravel/mcp` is installed; the package has to keep working without it.
+3. Keep the public API stable: `Ruvelo\HelpCenter\HelpCenter`, the models, events, exceptions, config keys, routes, the Blade component, the JSON shapes and the MCP tool names and arguments. If you must change one, say so in the PR.
 4. Run `composer format` and `composer check`.
 5. Add a line under **Unreleased** in [CHANGELOG.md](CHANGELOG.md).
 6. Open the pull request. Screenshots help for anything visual.
@@ -46,6 +46,8 @@ src/Markdown/                Rendering and [[article link]] parsing
 src/Http/Controllers/        The public site, Manage/ for the editor, Api/ for the JSON API
 src/View/Components/         <x-help::articles>, for contextual help in the host app
 src/Console/                 help:import and help:export
+src/Mcp/                     The optional MCP server and its tools (needs laravel/mcp, a dev dependency here)
+resources/boost/guidelines/  Laravel Boost guidelines for coding agents; update them when the API changes
 resources/views/             Blade views; the styles live in partials/styles.blade.php
 demo/                        The Halyard demo (deployed to GitHub Pages), its build script and screenshots
 ```

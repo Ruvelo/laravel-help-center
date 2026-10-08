@@ -83,6 +83,7 @@ It's the customer-facing sibling of [ruvelo/laravel-wiki](https://github.com/Ruv
 - **Contextual help** in your own pages with a Blade component.
 - **Import and export** folders of Markdown, with front matter.
 - **A JSON API** for React, Vue and Inertia frontends, off by default.
+- **Answers for AI agents**: an optional MCP server lets support teams' assistants and customer-facing chatbots search and quote your articles, and lets editors' agents draft them. Ships Laravel Boost guidelines too.
 - **Safe to render**: raw HTML in articles is escaped and `javascript:` links are dropped.
 - **Light and dark mode**, readable at phone width, and keyboard friendly.
 
@@ -91,6 +92,7 @@ It's the customer-facing sibling of [ruvelo/laravel-wiki](https://github.com/Ruv
 - PHP 8.3+
 - Laravel 12 or 13
 - Any database Laravel supports (tested on SQLite; plain SQL that also suits MySQL, MariaDB and Postgres)
+- Optional: [`laravel/mcp`](https://github.com/laravel/mcp) ^1.0 for the [MCP server](#use-it-from-ai-agents)
 
 ## Who can edit
 
@@ -141,6 +143,12 @@ php artisan vendor:publish --tag=help-center-config
 | `api.prefix` | `api/help` | Where the JSON API lives |
 | `api.middleware` | `['api']` | Applied to every API route; reads are public |
 | `api.write_middleware` | `['auth:sanctum']` | Added to API writes, on top of the gate |
+| `mcp.enabled` | `false` (`HELP_CENTER_MCP`) | Turn on the [MCP server](#use-it-from-ai-agents); needs `laravel/mcp` |
+| `mcp.path` | `mcp/help` | The MCP endpoint; `null` for stdio only |
+| `mcp.middleware` | `['api', 'auth:sanctum']` | Guards the endpoint. `['api', 'throttle:60,1']` makes it public (published articles only) |
+| `mcp.local` | `false` | Also serve over stdio: `php artisan mcp:start help-center` |
+| `mcp.allow_writes` | `false` (`HELP_CENTER_MCP_WRITES`) | Offer `write_article` to editors (the gate is always checked) |
+| `mcp.server` | `HelpCenterServer::class` | Your subclass, to add tools of your own |
 | `markdown.extensions` | `[]` | Extra CommonMark extensions |
 | `markdown.options` | `[]` | CommonMark options, merged over the defaults |
 
@@ -175,6 +183,118 @@ Show the right articles where people get stuck, like next to your billing settin
 ```
 
 `category` takes a slug or a name; `search` lists the best matches instead. It renders a compact list of published articles that link into the help center, with self-contained styles (every class starts with `hcw-`, included once per page). Pass `class` to add your own.
+
+## Use it from AI agents
+
+The help center can answer questions inside the AI tools people already use. Support agents can ask Claude, ChatGPT or Cursor "how do refunds work on annual plans?" and get the answer from your articles, with a link to send the customer. A chatbot on your site can do the same for customers.
+
+It's an [MCP](https://modelcontextprotocol.io) server built on [`laravel/mcp`](https://laravel.com/docs/mcp), off by default:
+
+```bash
+composer require laravel/mcp
+```
+
+```ini
+HELP_CENTER_MCP=true
+```
+
+Agents get these tools:
+
+| Tool | Does |
+|---|---|
+| `search_articles` | `query` (plus optional `category` and `limit`, up to 20) → published matches with `title`, `slug`, `excerpt`, `category` and `url`, best first |
+| `read_article` | `slug` → the article as `markdown`, with `title`, `category`, `url`, `version` and `updated_at` |
+| `list_categories` | Every category with its `slug`, `description`, `url` and published `article_count` |
+| `write_article` | Editors only, and only when `mcp.allow_writes` is on: create an article (a draft unless `status` is `published`) or change one by `slug` |
+
+Every article is also a resource, `help-center://articles/{slug}`, in Markdown.
+
+**Who sees what.** Drafts never reach anyone but editors (the `help-center-edit` gate). `search_articles` only ever returns published articles. `write_article` doesn't even appear in the tool list unless writes are allowed and the signed-in user passes the gate, and the gate is checked again on every call. It saves through `Article::commit()`, so every save is versioned and fires the usual events. Changing an article takes the `base_version` the agent read; if someone saved in between, nothing is saved and the agent is told to read the article again.
+
+**Signing in.** The endpoint is `POST /mcp/help`, behind `['api', 'auth:sanctum']` by default: give each person or bot a [Sanctum](https://laravel.com/docs/sanctum) token. A public help center has nothing to hide, so you may open it to everyone and rate-limit it instead:
+
+```php
+// config/help-center.php
+'mcp' => [
+    'middleware' => ['api', 'throttle:60,1'],
+    // ...
+],
+```
+
+Laravel MCP can also do OAuth through Passport; see [its docs](https://laravel.com/docs/mcp#authentication).
+
+**Connecting a client.** Most clients take a URL and a header. For Claude Code:
+
+```bash
+claude mcp add --transport http help https://example.com/mcp/help --header "Authorization: Bearer <your token>"
+```
+
+For clients configured with JSON, such as Cursor (`.cursor/mcp.json`) or VS Code (`.vscode/mcp.json`, which calls the key `servers`):
+
+```json
+{
+    "mcpServers": {
+        "help": {
+            "url": "https://example.com/mcp/help",
+            "headers": { "Authorization": "Bearer <your token>" }
+        }
+    }
+}
+```
+
+On your own machine you can skip HTTP: set `mcp.local` to `true` and point the client at Artisan. Over stdio no one is signed in, so it's read-only and shows published articles only.
+
+```json
+{
+    "mcpServers": {
+        "help": { "command": "php", "args": ["artisan", "mcp:start", "help-center"] }
+    }
+}
+```
+
+Try it with the inspector: `php artisan mcp:inspector mcp/help`.
+
+**A support chatbot with the Laravel AI SDK.** Agents built with [`laravel/ai`](https://laravel.com/docs/ai-sdk) accept Laravel MCP tools as they are, so you can ground a chatbot on the help center without running the server at all:
+
+```php
+namespace App\Ai\Agents;
+
+use Laravel\Ai\Contracts\Agent;
+use Laravel\Ai\Contracts\HasTools;
+use Laravel\Ai\Promptable;
+use Ruvelo\HelpCenter\Mcp\Tools\ListCategories;
+use Ruvelo\HelpCenter\Mcp\Tools\ReadArticle;
+use Ruvelo\HelpCenter\Mcp\Tools\SearchArticles;
+
+class SupportBot implements Agent, HasTools
+{
+    use Promptable;
+
+    public function instructions(): string
+    {
+        return 'You answer questions about Halyard. Search the help center first, read the best article, '
+            .'and answer in two or three sentences with its URL. If no article covers it, say so and '
+            .'suggest contacting support. Never guess.';
+    }
+
+    public function tools(): iterable
+    {
+        return [new SearchArticles, new ReadArticle, new ListCategories];
+    }
+}
+```
+
+```php
+$reply = (new SupportBot)->prompt('Can I get a refund on an annual plan?');
+```
+
+The tools see whoever is signed in, so a customer only ever gets published articles. Don't give `WriteArticle` to a customer-facing agent.
+
+**Your own tools.** Extend `Ruvelo\HelpCenter\Mcp\HelpCenterServer`, add to its `$tools`, and set `mcp.server` to your class.
+
+### Laravel Boost
+
+The package ships [Laravel Boost](https://laravel.com/docs/boost) guidelines in `resources/boost/guidelines/core.blade.php`. Run `php artisan boost:install` (or `boost:update --discover`) and your coding agent learns the `HelpCenter` API, the write path, events, the Blade component, the import commands and what to avoid.
 
 ## For developers
 

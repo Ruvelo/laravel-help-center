@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-08
+
+### Added
+
+- An optional MCP server for AI agents and support chatbots, on top of `laravel/mcp` (suggested, not required). Tools: `search_articles`, `read_article` and `list_categories`, plus `write_article` for editors. Every article is also a `help-center://articles/{slug}` Markdown resource.
+- `write_article` saves through `Article::commit()`: drafts by default, versioned, with the usual events, and refused with the current version when someone saved since the agent's `base_version`. It's listed only for users who pass the `help-center-edit` gate, only when `mcp.allow_writes` is on, and checked again on every call.
+- Drafts never reach anyone but editors through MCP; search returns published articles only.
+- `mcp.*` config: `enabled` (off by default, `HELP_CENTER_MCP`), `path`, `middleware` (`['api', 'auth:sanctum']` by default; may be opened up for a public help center), `local` (stdio through `php artisan mcp:start help-center`), `allow_writes` (off by default) and `server`.
+- The MCP tools work as Laravel AI SDK (`laravel/ai`) agent tools too, documented with a support chatbot example.
+- Laravel Boost guidelines in `resources/boost/guidelines/core.blade.php`, so coding agents use the `HelpCenter` API, the write path, events, `<x-help::articles>` and the import commands correctly.
+
 ## [1.0.0] - 2026-10-08
 
 First release.
@@ -31,5 +42,6 @@ First release.
 - Renders standalone or inside the host app's layout (`layout` and `section` config), with styles scoped under `.hc`.
 - Ruvelo house style UI: light and dark, no build step, themable through `--help-*` CSS variables.
 
-[Unreleased]: https://github.com/Ruvelo/laravel-help-center/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Ruvelo/laravel-help-center/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Ruvelo/laravel-help-center/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Ruvelo/laravel-help-center/releases/tag/v1.0.0
